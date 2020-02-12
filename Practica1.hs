@@ -39,6 +39,7 @@ data Arbol = Vacio | Nodo Arbol Int Arbol deriving(Show,Eq)
 --(3.0,4.0)
 puntoMedio :: (Float,Float) -> (Float,Float) -> (Float,Float)
 puntoMedio = error "Te toca"
+puntoMedio (x,y) (w,z) = ((x+w)/2,(y+z)/2)
 
 
 --Función que dada una ecuación de segundo grado encuentra las raices de esta en una
