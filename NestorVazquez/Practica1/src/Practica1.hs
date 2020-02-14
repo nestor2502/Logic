@@ -83,8 +83,8 @@ extremos n x = if n*2 >= length x
 --Definir la función numerosAbundantes tal que (numerosAbundantes n)
 --es la lista de números abundantes menores o iguales que n. Por ejemplo,
 --numerosAbundantes 50 == [12,18,20,24,30,36,40,42,48]
---numerosAbundantes :: Int -> [Int]
---numerosAbundantes n = [x | x<=n,esAbundante x]
+numerosAbundantes :: Int -> [Int]
+numerosAbundantes n = [ x | x <-[12..n], esAbundante x ]
 
 
 --Definir la función que recibe una lista y regrese una lista tal que 
@@ -134,7 +134,7 @@ divisores k = divisores' 1 k
                                    | n*n == k = [n, k]
                                    | k `mod` n == 0 = (n:(k `div` n):resultado)
                                    | otherwise = resultado
-    	                           where resultado = divisores' (n+1) k
+                                   where resultado = divisores' (n+1) k
 
 --Dados dos números x,y determina si y divide a x
 divisor :: Int -> Int -> Int
