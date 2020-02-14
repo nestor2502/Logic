@@ -84,7 +84,7 @@ extremos n x = if n*2 >= length x
 --es la lista de números abundantes menores o iguales que n. Por ejemplo,
 --numerosAbundantes 50 == [12,18,20,24,30,36,40,42,48]
 numerosAbundantes :: Int -> [Int]
-numerosAbundantes n = [ x | x <-[12..n], esAbundante x ]
+numerosAbundantes n = [ x | x <-[12..n], sumaDivisores x > x ]
 
 
 --Definir la función que recibe una lista y regrese una lista tal que 
@@ -105,8 +105,10 @@ numerosAbundantes n = [ x | x <-[12..n], esAbundante x ]
 --Definir la función dado un número nos regrese el primitivo. 
 --Ejemplo:
 --primitivo 327 ; 8
---primitivo :: Integer -> Integer
---primitivo = error "Te toca"
+primitivo :: Integer -> Integer
+primitivo n = if n <10 
+              then n
+              else primitivo (product (separaDigitos n))
 
 
 --Función que dadas dos listas y un Natural j, regresa una lista tal que, se encuentran 
@@ -121,27 +123,13 @@ numerosAbundantes n = [ x | x <-[12..n], esAbundante x ]
 
 -- Funciones auxiliares en caso de tenerlas van aquí
 
---Función que obtiene si un número es abundante
---Ejemplo:
---esAbundante :: Int -> Bool
---esAbundante n = if 
-
---Función que obtiene los divisores de un número n
---Ejemplo:
-divisores :: Int -> [Int]
-divisores k = divisores' 1 k
-              where divisores' n k | n*n > k = [k]
-                                   | n*n == k = [n, k]
-                                   | k `mod` n == 0 = (n:(k `div` n):resultado)
-                                   | otherwise = resultado
-                                   where resultado = divisores' (n+1) k
-
---Dados dos números x,y determina si y divide a x
+--Dados dos números x,y determina si y divide a x, si no regresa 0
 divisor :: Int -> Int -> Int
 divisor x y = if x `rem` y == 0 
                 then y
-			    else 0
+                else 0
 
+--Calcula la suma de los divisores de un número x
 sumaDivisores :: Int -> Int
 sumaDivisores 1 = 1
 sumaDivisores x = auxSumaDivisores x (x-1)
@@ -150,7 +138,9 @@ auxSumaDivisores :: Int -> Int -> Int
 auxSumaDivisores _ 1 = 1
 auxSumaDivisores x y = divisor x y + auxSumaDivisores x (y-1)
 
-esAbundante :: Int -> Bool
-esAbundante x = sumaDivisores x > x
+--Separa los digitos de un número x y los acomoda en una lista
+separaDigitos :: Integer -> [Integer]
+separaDigitos 0 = []
+separaDigitos x = separaDigitos (x `div` 10) ++ [x `mod` 10]
 
 --Suerte y no olviden seguir los lineamientos de entrega.
