@@ -84,7 +84,7 @@ extremos n x = if n*2 >= length x
 --es la lista de números abundantes menores o iguales que n. Por ejemplo,
 --numerosAbundantes 50 == [12,18,20,24,30,36,40,42,48]
 numerosAbundantes :: Int -> [Int]
-numerosAbundantes n = [ x | x <-[12..n], sumaDivisores x > x ]
+numerosAbundantes n = [ x | x <-[12..n], sum (divisores x) > x ]--empieza desde 12 pues tenemos certeza que es el 1er número abundante
 
 
 --Definir la función que recibe una lista y regrese una lista tal que 
@@ -120,27 +120,30 @@ primitivo n = if n <10
 --sipLis :: Nat -> Lista a -> Lista a -> Lista a
 --sipLis = error "Te toca
 
+--Función la cual convierte un  árbol en una lista haciendo el recorrido en preorden.
+--Ejemplo: aplanaArbolPre arbol1 = [2,0,-1,1,4,3,5].
+aplanaArbolPre :: Arbol -> [Int]
+aplanaArbolPre Vacio = []
+aplanaArbolPre t = [obtenerValorNodo (t)] ++ aplanaArbolPre (obtenerArbolIzq(t))
+    ++ aplanaArbolPre (obtenerArbolDer(t))
 
 -- Funciones auxiliares en caso de tenerlas van aquí
 
---Dados dos números x,y determina si y divide a x, si no regresa 0
-divisor :: Int -> Int -> Int
-divisor x y = if x `rem` y == 0 
-                then y
-                else 0
-
---Calcula la suma de los divisores de un número x
-sumaDivisores :: Int -> Int
-sumaDivisores 1 = 1
-sumaDivisores x = auxSumaDivisores x (x-1)
-
-auxSumaDivisores :: Int -> Int -> Int
-auxSumaDivisores _ 1 = 1
-auxSumaDivisores x y = divisor x y + auxSumaDivisores x (y-1)
+divisores :: Int -> [Int]
+divisores n = [x | x <- [1..(n-1)], n `rem` x == 0]
 
 --Separa los digitos de un número x y los acomoda en una lista
 separaDigitos :: Integer -> [Integer]
 separaDigitos 0 = []
 separaDigitos x = separaDigitos (x `div` 10) ++ [x `mod` 10]
+
+obtenerValorNodo:: Arbol -> Int
+obtenerValorNodo (Nodo _ x _) = x
+
+obtenerArbolIzq:: Arbol -> Arbol
+obtenerArbolIzq (Nodo t _ _) = t
+
+obtenerArbolDer:: Arbol -> Arbol
+obtenerArbolDer (Nodo _ _ t) = t
 
 --Suerte y no olviden seguir los lineamientos de entrega.
