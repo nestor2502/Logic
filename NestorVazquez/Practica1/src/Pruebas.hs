@@ -26,7 +26,8 @@ puntoMedio (x,y) (w,z) = ((x+w)/2,(y+z)/2)
 --Problema2
 raices :: Float -> Float -> Float -> (Complejo,Complejo)
 raices a b c= if r >=0
-                then (((-b+sqrt(s))/q, 0),((-b-sqrt(s))/q, 0))
+                then (((-b+sqrt(r))/q, 0),((-b-sqrt(r))/q, 0))
+                ---then ((r,0),(0,0))
                 else ((-(b)/q, sqrt(s)/q), (-b/q, -(sqrt(s))/q))
                 where
                 r= b^2-(4*a*c)
@@ -43,10 +44,12 @@ dIntervalos x y xs = (take (x-1) xs) ++ (drop (y) xs)
 
 --Problema 7
 eliminaDuplicados :: Eq a => [a] -> [a]
-eliminaDuplicados [] = []
-eliminaDuplicados (x:xs) = if x `elem` xs
-                            then eliminaDuplicados xs
-                            else x: eliminaDuplicados xs
+eliminaDuplicados listaNum | listaNum == [] = []
+| any (== head listaNum) (tail listaNum) = eliminaDuplicados (tail listaNum)
+| otherwise = (take 1 listaNum) ++ eliminaDuplicados (tail listaNum)
+--eliminaDuplicados (x:xs) = if x `elem` xs
+                           -- then eliminaDuplicados xs
+                           -- else x: eliminaDuplicados xs
 
 --Problema 9
 sipLis :: Nat -> Lista a -> Lista a -> Lista a
