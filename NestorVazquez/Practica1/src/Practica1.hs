@@ -14,7 +14,7 @@ module Practica1 where
 -- Tipos definidos
 
 --Definir el tipo Complejo
-type Complejo = (Float,Float)
+type Complejo = (Float,Float) 
 
 
 --Forma para definir el tipo de los números naturales
@@ -43,10 +43,10 @@ puntoMedio (x,y) (w,z) = ((x+w)/2,(y+z)/2)
 
 
 --Función que dada una ecuación de segundo grado encuentra las raices de esta en una
---pareja ordenada
 raices :: Float -> Float -> Float -> (Complejo,Complejo)
 raices a b c= if r >=0
-                then (((-b+sqrt(s))/q, 0),((-b-sqrt(s))/q, 0))
+                then (((-b+sqrt(r))/q, 0),((-b-sqrt(r))/q, 0))
+                ---then ((r,0),(0,0))
                 else ((-(b)/q, sqrt(s)/q), (-b/q, -(sqrt(s))/q))
                 where
                 r= b^2-(4*a*c)
@@ -58,8 +58,8 @@ raices a b c= if r >=0
 --segmento 3 4 [3,4,1,2,7,9,0] == [1,2]
 --segmento 3 5 [3,4,1,2,7,9,0] == [1,2,7]
 --segmento 5 3 [3,4,1,2,7,9,0] == []
---segmento :: Int -> Int -> [a] -> [a]
---segmento = error "Te toca"
+segmento :: Int -> Int -> [a] -> [a]
+segmento x y xs = drop (x-1) (take y xs)
 
 
 --Definir la función extremos tal que (extremos n xs) es la lista formada
@@ -74,8 +74,8 @@ extremos n x = if n*2 >= length x
 --elimina los elementos que se encuentren en el intervalo de esos dos numeros.
 --Por ejemplo,
 --dIntervalos 2 4 [1,2,3,4,5,6,7] == [1,5,6,7]
---dIntervalos :: Int -> Int -> [a] -> [a]
---dIntervalos = error "Te toca"
+dIntervalos :: Int -> Int -> [a] -> [a]
+dIntervalos x y xs = (take (x-1) xs) ++ (drop (y) xs)
 
 
 --Un número natural n se denomina abundante si es menor que la suma de sus divisores
@@ -91,9 +91,11 @@ numerosAbundantes n = [ x | x <-[12..n], sum (divisores x) > x ]--empieza desde 
 --la lista resultante contiene los mismos elementos que la original pero
 --sin duplicados.
 --Ejemplo:
---eliminaDuplicados [1,3,1,2,3,2,1] ; [1,3,2]
---eliminaDuplicados :: Eq a => [a] -> [a]
---eliminaDuplicados = error "Te toca"
+eliminaDuplicados :: Eq a => [a] -> [a]
+eliminaDuplicados [] = []
+eliminaDuplicados (x:xs) = if x `elem` xs
+                            then eliminaDuplicados xs
+                            else x: eliminaDuplicados xs
 
 
 --Se define el primitivo de un número como sigue:
@@ -117,8 +119,12 @@ primitivo n = if n <10
 --Ejemplo:
 --sipLis (Suc (Suc Cero)) (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nula))))) (Cons 7 (Cons 8 (Cons 9 Nula))) ==
 --(Cons 2 (Cons 8 (Cons 3 (Cons 9 Nula))))
---sipLis :: Nat -> Lista a -> Lista a -> Lista a
---sipLis = error "Te toca
+sipLis :: Nat -> Lista a -> Lista a -> Lista a
+sipLis Cero Nula ys = Nula
+sipLis Cero xs Nula = Nula
+sipLis Cero (Cons x xs) (Cons y ys) = Cons x (Cons y (sipLis Cero xs ys) ) 
+sipLis (Suc Cero) (Cons x xs) (Cons y ys) = Cons x (Cons y (sipLis Cero xs ys) ) 
+sipLis (Suc m) (Cons x xs) (Cons y ys) = sipLis(m) xs ys
 
 --Función la cual convierte un  árbol en una lista haciendo el recorrido en preorden.
 --Ejemplo: aplanaArbolPre arbol1 = [2,0,-1,1,4,3,5].
