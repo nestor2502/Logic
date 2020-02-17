@@ -5,7 +5,7 @@
 - Número de cuenta: 316184924
 -Correo: josedavidrr@ciencias.unam.mx
 - Alumno: Néstor Semer Vázquez Cordero
-- Número de cuenta:  
+- Número de cuenta: 316041625
 -Correo: nestor2502@ciencias.unam.mx
 -}
 
@@ -151,5 +151,3 @@ obtenerArbolIzq (Nodo t _ _) = t
 
 obtenerArbolDer:: Arbol -> Arbol
 obtenerArbolDer (Nodo _ _ t) = t
-
---Suerte y no olviden seguir los lineamientos de entrega.
