@@ -11,6 +11,8 @@
 
 module Practica2 where
 
+import Data.List
+
 -- ---------------------------------------------------------------------
 -- Definimos los siguientes tipos de datos:
 -- Prop para representar las fórmulas proposicionales usando los
@@ -62,7 +64,14 @@ u = Var "u"
 -- ---------------------------------------------------------------------
 
 variables :: Prop -> Estado
-variables =  error "Te toca"
+variables phi = case phi of
+	T -> []
+	F -> []
+	Var alpha -> [alpha]
+	Neg alpha -> nub (variables alpha)
+	Conj alpha beta -> nub(variables alpha ++ variables beta)
+	Disy alpha beta -> nub(variables alpha ++ variables beta)
+	Impl alpha beta -> nub(variables alpha ++ variables beta)
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 2: Definir la función
@@ -78,7 +87,8 @@ variables =  error "Te toca"
 -- ---------------------------------------------------------------------
 
 conjPotencia :: [a] -> [[a]]
-conjPotencia = error "Te toca"
+conjPotencia [] = [[]]
+conjPotencia (x:xs) = [x:ys | ys <- conjPotencia xs] ++ conjPotencia xs
 
 -- ---------------------------------------------------------------------
 -- Interpretaciones --
@@ -94,7 +104,16 @@ conjPotencia = error "Te toca"
 -- ---------------------------------------------------------------------
 
 interpretacion :: Prop -> Estado -> Bool
-interpretacion = error "Te toca"
+interpretacion phi alpha = case phi of
+	T -> True
+	F -> False
+	Var beta -> elem beta alpha
+	Neg beta -> not(interpretacion beta alpha)
+	Conj beta gamma -> (interpretacion beta alpha) && (interpretacion gamma alpha)
+	Disy beta gamma -> (interpretacion beta alpha) || (interpretacion gamma alpha)
+	Impl beta gamma -> (not(interpretacion beta alpha)) || (interpretacion gamma alpha)
+	Equi beta gamma -> (interpretacion (Impl beta gamma) alpha) && (interpretacion (Impl gamma beta) alpha)
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 4: Definir una función que dada una fórmula proposicional,
@@ -105,7 +124,7 @@ interpretacion = error "Te toca"
 -- ---------------------------------------------------------------------
 
 estadosPosibles :: Prop -> [Estado]
-estadosPosibles = error "Te toca"
+estadosPosibles phi = conjPotencia (variables phi)
 
 
 -- ---------------------------------------------------------------------
@@ -118,7 +137,7 @@ estadosPosibles = error "Te toca"
 -- ---------------------------------------------------------------------
 
 tautologia :: Prop -> Bool
-tautologia = error "Te toca"
+tautologia phi = and[interpretacion phi xs | xs <- conjPotencia(variables phi)]
 
 
 -- ---------------------------------------------------------------------
@@ -131,7 +150,7 @@ tautologia = error "Te toca"
 -- ---------------------------------------------------------------------
 
 contradiccion :: Prop -> Bool
-contradiccion = error "Te toca"
+contradiccion phi = and[not (interpretacion phi xs) | xs <- conjPotencia(variables phi)]
 
 
 -- ---------------------------------------------------------------------
@@ -148,7 +167,15 @@ contradiccion = error "Te toca"
 -- ---------------------------------------------------------------------
 
 esModelo :: Estado -> Prop -> Bool
-esModelo = error "Te toca"
+esModelo e phi = case phi of
+	T -> True
+	F -> False 
+	Var alpha -> elem alpha e
+	Neg alpha -> not(esModelo e alpha)
+	Conj alpha beta -> (esModelo e alpha) && (esModelo e beta)
+	Disy alpha beta -> (esModelo e alpha) || (esModelo e beta)
+	Impl alpha beta -> not(esModelo e alpha) || (esModelo e beta)
+	Equi alpha beta -> (esModelo e (Impl alpha beta)) && (esModelo e (Impl beta alpha))
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 8: Definir una función que dada una fórmula proposicional
@@ -159,7 +186,7 @@ esModelo = error "Te toca"
 -- ---------------------------------------------------------------------
 
 modelos :: Prop -> [Estado]
-modelos = error "Te toca"
+modelos phi = [e | e <- estadosPosibles phi, esModelo e phi]
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 9: Definir una función que dada una fórmula proposicional f
@@ -180,7 +207,7 @@ esValida = error "Te toca"
 -- verifica si f es insatisfacible. Por ejemplo,
 -- esInsatisfacible (Conj p (Neg p)) 
 -- True
--- esInsatisfacible (Conj (Impl p q) (Impl q r)) 
+-- esInsatisfacible (Conj (Impl p q) (Impl q r))
 -- False
 -- ---------------------------------------------------------------------
 
@@ -197,4 +224,4 @@ esInsatisfacible = error "Te toca"
 -- ---------------------------------------------------------------------
 
 esSatisfacible :: Prop -> Bool
-esSatisfacible = error "Te toca"
+esSatisfacible = or [interpretacion phi xs | xs <- conjPotencia(variables phi)]
