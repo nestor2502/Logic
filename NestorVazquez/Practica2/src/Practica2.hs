@@ -146,8 +146,6 @@ tautologia phi = and[interpretacion phi xs | xs <- estadosPosibles(phi)]
 -- nos diga si es una contradicción. Por ejemplo,
 -- >contradiccion Disy (Var "p") (Neg (Var "p"))
 -- False
--- >contradiccion Disy (Var "q") (Var "r")
--- True
 -- ---------------------------------------------------------------------
 
 contradiccion :: Prop -> Bool
@@ -213,7 +211,7 @@ esValida phi = tautologia (phi)
 -- ---------------------------------------------------------------------
 
 esInsatisfacible :: Prop -> Bool
-esInsatisfacible = contradiccion (phi)
+esInsatisfacible phi = contradiccion (phi)
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 11: Definir una función que dada una fórmula proposicional f
@@ -225,4 +223,4 @@ esInsatisfacible = contradiccion (phi)
 -- ---------------------------------------------------------------------
 
 esSatisfacible :: Prop -> Bool
-esSatisfacible phi = or [interpretacion phi xs | xs <- estadosPosibles (phi))]
+esSatisfacible phi = or [interpretacion phi xs | xs <- estadosPosibles (phi)]
