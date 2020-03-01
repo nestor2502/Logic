@@ -72,6 +72,7 @@ variables phi = case phi of
 	Conj alpha beta -> nub(variables alpha ++ variables beta)
 	Disy alpha beta -> nub(variables alpha ++ variables beta)
 	Impl alpha beta -> nub(variables alpha ++ variables beta)
+	Equi alpha beta -> nub(variables alpha ++ variables beta)
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 2: Definir la función
@@ -137,7 +138,7 @@ estadosPosibles phi = conjPotencia (variables phi)
 -- ---------------------------------------------------------------------
 
 tautologia :: Prop -> Bool
-tautologia phi = and[interpretacion phi xs | xs <- conjPotencia(variables phi)]
+tautologia phi = and[interpretacion phi xs | xs <- estadosPosibles(phi)]
 
 
 -- ---------------------------------------------------------------------
@@ -150,7 +151,7 @@ tautologia phi = and[interpretacion phi xs | xs <- conjPotencia(variables phi)]
 -- ---------------------------------------------------------------------
 
 contradiccion :: Prop -> Bool
-contradiccion phi = and[not (interpretacion phi xs) | xs <- conjPotencia(variables phi)]
+contradiccion phi = and[not (interpretacion phi xs) | xs <- estadosPosibles(phi)]
 
 
 -- ---------------------------------------------------------------------
@@ -200,7 +201,7 @@ modelos phi = [e | e <- estadosPosibles phi, esModelo e phi]
 -- ---------------------------------------------------------------------
 
 esValida :: Prop -> Bool
-esValida = error "Te toca"
+esValida phi = tautologia (phi)
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 10: Definir una función que dada una fórmula proposicional f
@@ -212,7 +213,7 @@ esValida = error "Te toca"
 -- ---------------------------------------------------------------------
 
 esInsatisfacible :: Prop -> Bool
-esInsatisfacible = error "Te toca"
+esInsatisfacible = contradiccion (phi)
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 11: Definir una función que dada una fórmula proposicional f
@@ -224,4 +225,4 @@ esInsatisfacible = error "Te toca"
 -- ---------------------------------------------------------------------
 
 esSatisfacible :: Prop -> Bool
-esSatisfacible = or [interpretacion phi xs | xs <- conjPotencia(variables phi)]
+esSatisfacible phi = or [interpretacion phi xs | xs <- estadosPosibles (phi))]
