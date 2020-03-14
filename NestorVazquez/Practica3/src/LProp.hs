@@ -141,7 +141,7 @@ dist p = case p of
   TTrue -> TTrue
   FFalse -> FFalse
   V beta -> V beta
-  Neg beta -> Neg beta
+  Neg beta -> Neg (dist(beta))
   Conj beta gamma -> Conj (dist beta)(dist gamma)
   Disy beta gamma -> if esConjuncion(gamma)
                      then Conj (Disy (beta)(auxDist1 (gamma)))(Disy (beta)(auxDist2 (gamma))) 
