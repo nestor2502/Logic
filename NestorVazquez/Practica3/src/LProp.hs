@@ -1,7 +1,12 @@
-{ -
-- Logica Conmputacional 2020-2 
-- Practica 3, LP en Haskell y FNC
-- Creador: Pedro Juan Salvador Sánchez Pérez
+{-
+- Lógica computacional 2020-2
+- Practica 3
+- Alumno: José David Ramírez Rojas
+- Número de cuenta: 316184924
+- Correo: josedavidrr@ciencias.unam.mx
+- Alumno: Néstor Semer Vázquez Cordero
+- Número de cuenta: 316041625
+- Correo: nestor2502@ciencias.unam.mx
 -}
 
 module LProp where
@@ -70,13 +75,30 @@ peso _ = 0
 
 -- --> elimEquiv (Equiv (V p) (V q)) = (Conj (Imp (V p) (V q)) (Imp (V q) (V p)))
 elimEquiv :: Prop -> Prop
-elimEquiv phi = error "Funcion a implementar"
+elimEquiv phi = case phi of 
+  TTrue -> TTrue
+  FFalse -> FFalse
+  V beta -> V beta
+  Neg beta -> Neg (elimEquiv beta)
+  Conj beta gamma -> Conj (elimEquiv beta )(elimEquiv gamma )
+  Disy beta gamma -> Disy (elimEquiv beta ) (elimEquiv gamma )
+  Imp beta gamma -> Imp(elimEquiv beta ) (elimEquiv gamma)
+  Equiv beta gamma -> Conj(Imp (elimEquiv beta) (elimEquiv gamma)) (Imp (elimEquiv gamma) (elimEquiv beta))
 
 -- | elimImp. Funció que dada una fórmula devuelve su equivalente que no contiene implicaciones.
 --
 -- --> elimEquiv (Imp (V p) (Disy (V q) (FFalse))) = Disy (Neg (V p)) (Disy (V q) FFalse)
 elimImp :: Prop -> Prop
-elimImp phi = error "funcion a implementar"
+elimImp phi = case phi of 
+  TTrue -> TTrue
+  FFalse -> FFalse
+  V beta -> V beta
+  Neg beta -> Neg (elimImp beta)
+  Conj beta gamma -> Conj (elimImp beta )(elimImp gamma )
+  Disy beta gamma -> Disy (elimImp beta ) (elimImp gamma )
+  Imp beta gamma -> Disy (Neg beta ) (gamma)
+  Equiv beta gamma -> Equiv(elimImp beta) (elimImp gamma)
+
 
 -- | elimIE. Función que dada una fórmula devuelve su equivalente que no contiene implicaciones,
 -- ni equivalencias.
@@ -88,8 +110,24 @@ elimIE p = elimImp $ elimEquiv p
 -- equivalente pero las negaciones que existen solo aplican a formulas atomicas. tambien elimina la doble negacion. la funcion supone
 -- que la fomula ya no tiene implicaciones ni equivalencias.
 meteNeg :: Prop -> Prop
-meteNeg p = error "Funcion a implementar"
+meteNeg p = case p of 
+  TTrue -> TTrue
+  FFalse -> FFalse
+  V beta -> V beta
+  Neg beta -> auxMeteNeg (beta)
+  Conj beta gamma -> Conj (meteNeg beta )(meteNeg gamma )
+  Disy beta gamma -> Disy (meteNeg beta ) (meteNeg gamma )
 
+auxMeteNeg :: Prop -> Prop
+auxMeteNeg p = case p of 
+  TTrue -> TTrue
+  FFalse -> FFalse
+  V beta -> Neg (V beta)
+  Neg beta -> beta
+  Conj beta gamma -> Disy (Neg (beta) )(Neg (gamma) )
+  Disy beta gamma -> Conj (Neg (beta) )(Neg (gamma) )
+
+  
 -- / funcion que reciba una formula de la logica proposicional y devuelva una formula
 -- equivalente tal que este en forma normal negativa,
 fnn :: Prop -> Prop 
@@ -99,7 +137,39 @@ fnn p = meteNeg (elimIE p)
 -- equivalente pero que distribuye la disyuncion sobre la conjuncion (Ej. p v (q ^ r) = (p v q) ^ (p v r)). la funcion supone que la formula 
 -- esta en forma normal negativa
 dist :: Prop -> Prop
-dist p = error "Funcion a implementar"
+dist p = case p of 
+  TTrue -> TTrue
+  FFalse -> FFalse
+  V beta -> V beta
+  Neg beta -> Neg beta
+  Conj beta gamma -> Conj (dist beta)(dist gamma)
+  Disy beta gamma -> if esConjuncion(gamma)
+                     then Conj (Disy (beta)(auxDist1 (gamma)))(Disy (beta)(auxDist2 (gamma))) 
+                     else Disy (dist beta)(dist gamma)
+
+esConjuncion :: Prop -> Bool
+esConjuncion (Conj _ _) = True
+esConjuncion _ = False
+
+--auxiliar que obtiene la primera parte de una conjuncion   
+auxDist1 :: Prop -> Prop
+auxDist1 p = case p of 
+  TTrue -> TTrue
+  FFalse -> FFalse
+  V beta -> V beta
+  Neg beta -> Neg beta
+  Conj beta gamma -> beta
+  Disy beta gamma -> Disy (beta)(gamma) 
+
+--auxiliar que obtiene la segunda parte de una conjuncion
+auxDist2 :: Prop -> Prop
+auxDist2 p = case p of 
+  TTrue -> TTrue
+  FFalse -> FFalse
+  V beta -> V beta
+  Neg beta -> Neg beta
+  Conj beta gamma -> gamma
+  Disy beta gamma -> Disy (beta)(gamma) 
 
 -- / funcion que reciba una formula de la logica proposicional y devuelva una formula
 -- equivalente tal que este en forma normal conjuntiva,
