@@ -14,36 +14,77 @@ type Clausula = [Literal]
 type Formula = [Clausula]
 type Modelo = [Literal]
 type Solucion = (Modelo, Formula)
+type AuxSplit = [Solucion]
 
 -- Seccion de funciones para la regla de la clausula unitaria
 
-unit :: Solucion -> Solucion
+unit :: Solucion -> Solucion --NO
 unit s@(m,f) = error "Funcion a implementar"
 
 --  Seccion de funciones para la regla de eliminacion
 
 elim :: Solucion -> Solucion
-elim s@(m,f) = error "Funcion a implementar"
+elim ([],[])= ([],[])
+elim(m, f) = (m,elimi_formula_conj m f)
+
+-- si una si alguna literal del modelo se encuentra en alguna clausula de la formula, elimina la clausula
+
+elimi_formula_conj ::Modelo -> Formula -> Formula
+elimi_formula_conj [x] f = elimi_formula x f
+elimi_formula_conj (x:xs) f =  elimi_formula_conj xs (elimi_formula x f)             
+
+-- Si una literal se encuentra en una clausula de una formula elimina la clausula
+
+elimi_formula :: Literal -> Formula -> Formula
+elimi_formula l [x] = [pertenece l x]
+elimi_formula l (x:xs) = elimina_vacia(pertenece l x:elimi_formula l xs)
+
+--si se encuentra una literal en una clausula elimina la clausula
+	
+pertenece :: Literal -> Clausula-> Clausula
+pertenece l xs=  if elem l xs
+					then []
+					else xs
+
+--Funcion que elimina a la lista vacia de una formula
+
+elimina_vacia :: Formula -> Formula
+elimina_vacia [] = []
+elimina_vacia xs = [x | x<- xs, x/=[]]
 
 -- Seccion de funciones para la regla de reduccion
 
-red :: Solucion -> Solucion
+red :: Solucion -> Solucion  --NO
 red s@(m,f) = error "Funcion a implementar"
 
 -- Seccion de funciones para la regla de separacion
 
-split :: Solucion -> Solucion
-split s@(m,f) = error "Funcion a implementar"
+split :: Solucion -> AuxSplit
+split (m,f) = [(seleccionar_literal_de_for f :m, f), (Neg(seleccionar_literal_de_for f): m,f)]
 
+--auxiliar 1 que selecciona una literal de una formula
+
+seleccionar_literal_de_for :: Formula -> Literal
+seleccionar_literal_de_for [x] = seleccionar_literal_de_clau x
+seleccionar_literal_de_for (x:xs) = seleccionar_literal_de_clau x
+
+
+--Auxiliar 2 que selecciona una literal de una clausula
+
+seleccionar_literal_de_clau :: Clausula -> Literal
+seleccionar_literal_de_clau [x] = x
+seleccionar_literal_de_clau (x:xs) = x
 -- Seccion de funciones para la regla de conflicto
 
-conflict :: Solucion -> Bool
+conflict :: Solucion -> Bool  --NO
 conflict (m,f) = error "Funcion a implementar"
 
 -- Seccion de funciones para la regla de exito
 
 success :: Solucion -> Bool
-success (m,f) = error "Funcion a implementar"
+success (m,f) = if f == []
+					then True
+					else False
 
 -- Ejemplos
 
