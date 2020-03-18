@@ -55,7 +55,32 @@ elimina_vacia xs = [x | x<- xs, x/=[]]
 -- Seccion de funciones para la regla de reduccion
 
 red :: Solucion -> Solucion  --NO
-red s@(m,f) = error "Funcion a implementar"
+red ([],[])= ([],[])
+red(m, f) = (m,reduce_formula_conj m f)
+
+--Funcion auxiliar que verifica las variables complementarias de un modelo en una formula
+
+reduce_formula_conj ::Modelo -> Formula -> Formula
+reduce_formula_conj [x] f = reduce_no_nec x f
+reduce_formula_conj (x:xs) f =  reduce_formula_conj xs (elimi_formula x f) 
+
+--funcion auxiliar que elimina las literales complementarias de una formula
+
+reduce_no_nec :: Literal -> Formula -> Formula
+reduce_no_nec l [x] = elimina_vacia [red1 l x]
+reduce_no_nec l (x:xs) = elimina_vacia (red1 l x : reduce_no_nec l xs)
+
+--auxiliar 1, verifique si se encuentra una literal complementaria y la elimina
+red1 :: Literal -> Clausula -> Clausula
+red1 l xs =  [ x | x<- xs , (aux_com l x)==False]
+
+-- Si una literal es complementaria de otra devuelve true
+
+aux_com :: Literal -> Literal -> Bool
+aux_com l m = if l == Neg m || m == Neg l 
+			then True
+			else False
+
 
 -- Seccion de funciones para la regla de separacion
 
@@ -103,3 +128,5 @@ exa5 = [[V "p", V "q", V "r"],
         [V "q", Neg (V "u")],
         [Neg (V "r"), Neg (V "u")]]
 exa6 = [[V "p"], [Neg (V "p")]]     
+
+
