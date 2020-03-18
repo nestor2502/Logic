@@ -14,36 +14,102 @@ type Clausula = [Literal]
 type Formula = [Clausula]
 type Modelo = [Literal]
 type Solucion = (Modelo, Formula)
+type AuxSplit = [Solucion]
 
 -- Seccion de funciones para la regla de la clausula unitaria
 
-unit :: Solucion -> Solucion
+unit :: Solucion -> Solucion --NO
 unit s@(m,f) = error "Funcion a implementar"
 
 --  Seccion de funciones para la regla de eliminacion
 
 elim :: Solucion -> Solucion
-elim s@(m,f) = error "Funcion a implementar"
+elim ([],[])= ([],[])
+elim(m, f) = (m,elimi_formula_conj m f)
+
+-- si una si alguna literal del modelo se encuentra en alguna clausula de la formula, elimina la clausula
+
+elimi_formula_conj ::Modelo -> Formula -> Formula
+elimi_formula_conj [x] f = elimi_formula x f
+elimi_formula_conj (x:xs) f =  elimi_formula_conj xs (elimi_formula x f)             
+
+-- Si una literal se encuentra en una clausula de una formula elimina la clausula
+
+elimi_formula :: Literal -> Formula -> Formula
+elimi_formula l [x] = [pertenece l x]
+elimi_formula l (x:xs) = elimina_vacia(pertenece l x:elimi_formula l xs)
+
+--si se encuentra una literal en una clausula elimina la clausula
+	
+pertenece :: Literal -> Clausula-> Clausula
+pertenece l xs=  if elem l xs
+					then []
+					else xs
+
+--Funcion que elimina a la lista vacia de una formula
+
+elimina_vacia :: Formula -> Formula
+elimina_vacia [] = []
+elimina_vacia xs = [x | x<- xs, x/=[]]
 
 -- Seccion de funciones para la regla de reduccion
 
-red :: Solucion -> Solucion
-red s@(m,f) = error "Funcion a implementar"
+red :: Solucion -> Solucion  --NO
+red ([],[])= ([],[])
+red(m, f) = (m,reduce_formula_conj m f)
+
+--Funcion auxiliar que verifica las variables complementarias de un modelo en una formula
+
+reduce_formula_conj ::Modelo -> Formula -> Formula
+reduce_formula_conj [x] f = reduce_no_nec x f
+reduce_formula_conj (x:xs) f =  reduce_formula_conj xs (elimi_formula x f) 
+
+--funcion auxiliar que elimina las literales complementarias de una formula
+
+reduce_no_nec :: Literal -> Formula -> Formula
+reduce_no_nec l [x] = elimina_vacia [red1 l x]
+reduce_no_nec l (x:xs) = elimina_vacia (red1 l x : reduce_no_nec l xs)
+
+--auxiliar 1, verifique si se encuentra una literal complementaria y la elimina
+red1 :: Literal -> Clausula -> Clausula
+red1 l xs =  [ x | x<- xs , (aux_com l x)==False]
+
+-- Si una literal es complementaria de otra devuelve true
+
+aux_com :: Literal -> Literal -> Bool
+aux_com l m = if l == Neg m || m == Neg l 
+			then True
+			else False
+
 
 -- Seccion de funciones para la regla de separacion
 
-split :: Solucion -> Solucion
-split s@(m,f) = error "Funcion a implementar"
+split :: Solucion -> AuxSplit
+split (m,f) = [(seleccionar_literal_de_for f :m, f), (Neg(seleccionar_literal_de_for f): m,f)]
 
+--auxiliar 1 que selecciona una literal de una formula
+
+seleccionar_literal_de_for :: Formula -> Literal
+seleccionar_literal_de_for [x] = seleccionar_literal_de_clau x
+seleccionar_literal_de_for (x:xs) = seleccionar_literal_de_clau x
+
+
+--Auxiliar 2 que selecciona una literal de una clausula
+
+seleccionar_literal_de_clau :: Clausula -> Literal
+seleccionar_literal_de_clau [x] = x
+seleccionar_literal_de_clau (x:xs) = x
 -- Seccion de funciones para la regla de conflicto
 
-conflict :: Solucion -> Bool
+conflict :: Solucion -> Bool  --NO
 conflict (m,f) = error "Funcion a implementar"
 
 -- Seccion de funciones para la regla de exito
 
 success :: Solucion -> Bool
-success (m,f) = error "Funcion a implementar"
+success (m,f) = if f == []
+					then True
+					else False
 
 -- Ejemplos
 
@@ -62,3 +128,5 @@ exa5 = [[V "p", V "q", V "r"],
         [V "q", Neg (V "u")],
         [Neg (V "r"), Neg (V "u")]]
 exa6 = [[V "p"], [Neg (V "p")]]     
+
+
