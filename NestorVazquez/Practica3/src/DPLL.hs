@@ -18,8 +18,28 @@ type AuxSplit = [Solucion]
 
 -- Seccion de funciones para la regla de la clausula unitaria
 
-unit :: Solucion -> Solucion --NO
-unit s@(m,f) = error "Funcion a implementar"
+unit :: Solucion -> Solucion 
+unit ([],[]) = ([],[])
+unit (m,f) = (agrega_unitaria_de_formula f, delete (agrega_unitaria_de_formula f) f)
+
+
+agrega_unitaria_de_formula :: Formula -> Modelo 
+agrega_unitaria_de_formula [] = []                          
+agrega_unitaria_de_formula (x:xs) = if length (x) == 1
+                                    then
+                                        agrega_unitaria_de_clau x
+                                    else 
+                                    	agrega_unitaria_de_formula xs 
+
+agrega_unitaria_de_clau :: Clausula -> Modelo 
+agrega_unitaria_de_clau [c] = [agrega_unitaria_de_literal c]
+agrega_unitaria_de_clau (x:xs) = []
+
+agrega_unitaria_de_literal :: Literal -> Literal 
+agrega_unitaria_de_literal l = case l of 
+                                 V beta -> V beta
+                                 Neg beta -> Neg (beta)
+
 
 --  Seccion de funciones para la regla de eliminacion
 
@@ -99,10 +119,13 @@ seleccionar_literal_de_for (x:xs) = seleccionar_literal_de_clau x
 seleccionar_literal_de_clau :: Clausula -> Literal
 seleccionar_literal_de_clau [x] = x
 seleccionar_literal_de_clau (x:xs) = x
+
 -- Seccion de funciones para la regla de conflicto
 
 conflict :: Solucion -> Bool  --NO
-conflict (m,f) = error "Funcion a implementar"
+conflict (m,f) = if f == [[]]
+                 then True
+                 else False
 
 -- Seccion de funciones para la regla de exito
 
