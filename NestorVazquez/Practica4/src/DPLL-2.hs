@@ -14,6 +14,7 @@ type Clausula = [Literal]
 type Formula = [Clausula]
 type Modelo = [Literal]
 type Solucion = (Modelo, Formula)
+type AuxSplit = [Solucion]
 
 -- Seccion de funciones para la regla de la clausula unitaria
 unit :: Solucion -> Solucion 
@@ -121,7 +122,7 @@ seleccionar_literal_de_clau (x:xs) = x
 -- Seccion de funciones para la regla de conflicto
 
 conflict :: Solucion -> Bool  --NO
-conflict (m,f) = if f == [[]]
+conflict (m,f) = if elem [] f
                  then True
                  else False
 
