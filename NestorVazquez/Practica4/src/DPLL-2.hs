@@ -56,7 +56,7 @@ elimi_formula_conj (x:xs) f =  elimi_formula_conj xs (elimi_formula x f)
 
 elimi_formula :: Literal -> Formula -> Formula
 elimi_formula l [x] = [pertenece l x]
-elimi_formula l (x:xs) = elimina_vacia(pertenece l x:elimi_formula l xs)
+elimi_formula l (x:xs) = elimina_vacia(pertenece l x:reduce_no_nec l xs)
 
 --si se encuentra una literal en una clausula elimina la clausula
 	
@@ -66,7 +66,6 @@ pertenece l xs=  if elem l xs
 					else xs
 
 --Funcion que elimina a la lista vacia de una formula
-
 elimina_vacia :: Formula -> Formula
 elimina_vacia [] = []
 elimina_vacia xs = [x | x<- xs, x/=[]]
@@ -86,8 +85,8 @@ reduce_formula_conj (x:xs) f =  reduce_formula_conj xs (elimi_formula x f)
 --funcion auxiliar que elimina las literales complementarias de una formula
 
 reduce_no_nec :: Literal -> Formula -> Formula
-reduce_no_nec l [x] = elimina_vacia [red1 l x]
-reduce_no_nec l (x:xs) = elimina_vacia (red1 l x : reduce_no_nec l xs)
+reduce_no_nec l [x] =  [red1 l x]
+reduce_no_nec l (x:xs) = red1 l x : reduce_no_nec l xs
 
 --auxiliar 1, verifique si se encuentra una literal complementaria y la elimina
 red1 :: Literal -> Clausula -> Clausula
@@ -133,7 +132,7 @@ success (m,f) = if f == []
 					then True
 					else False
 
--- Sección de funciones auxiliares para dpllsearch
+-- Sección de funciones auxiliares de dpllsearch
 
 -- Devuelve si quedan literales dentro de la fórmula del lado derecho
 no_quedan_unit :: Solucion -> Bool
@@ -145,16 +144,41 @@ no_quedan_unit (m,f) = if unit ([],f) == ([],f)
 modelo_vacio :: Solucion -> Bool
 modelo_vacio (m,f) = if m == []	
                        then True
-                       else False			
+                       else False
+     
+-- Devuelve si quedan literales complementarias dentro de la fórmula del lado derecho
+no_quedan_lit_complementarias :: Solucion -> Bool
+no_quedan_lit_complementarias (m,f) = if red (m,f) == (m,f)	
+                                        then True
+                                        else False
+
+-- Devuelve si quedan literales complementarias dentro de la fórmula del lado derecho
+no_quedan_lit_en_clausulas_de_form :: Solucion -> Bool
+no_quedan_lit_en_clausulas_de_form (m,f) = if elim (m,f) == (m,f)
+                                        then True
+                                        else False   
+
+dpll_splitted :: AuxSplit -> Solucion
+dpll_splitted [x] = dpll x
+dpll_splitted (x:xs) = if conflict (dpll (x)) == False
+	                   then dpll x
+	                    else error "kk"
 
 -- Seccion de las funciones principales de DPLL
 
 dpllsearch :: Solucion-> Solucion  
+dpllsearch (m, []) = (m, [])
 dpllsearch (m,f) = if modelo_vacio (m,f) == True
-	                  then dpll (unit (m,f)) 
-	                  else if no_quedan_unit (m,f) == False
-	                  	   then dpll (unit (m,f))
-	                  	   else error "k"
+	               then if no_quedan_unit (m,f) == True
+	                  	then dpll_splitted (split (m,f))
+	                  	else dpll (unit (m,f))
+	               else if no_quedan_lit_complementarias (m,f) == False --error actual al verif esta condicion
+	                  	then dpll (red (m,f))
+	                  	else if no_quedan_lit_en_clausulas_de_form (m,f) == False 
+	                  	     then dpll (elim (m,f)) 
+                             else if no_quedan_unit (m,f) == False
+	                              then dpll (unit (m,f))
+	                              else dpll_splitted (split (m,f))
 
 dpll :: Solucion -> Solucion
 dpll (m,f) = if success(m,f) == True
