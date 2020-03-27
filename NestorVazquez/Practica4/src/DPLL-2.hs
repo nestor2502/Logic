@@ -19,7 +19,7 @@ type AuxSplit = [Solucion]
 -- Seccion de funciones para la regla de la clausula unitaria
 unit :: Solucion -> Solucion 
 unit ([],[]) = ([],[])
-unit (m,f) = (agrega_unitaria_de_formula f, delete (agrega_unitaria_de_formula f) f)
+unit (m,f) = ( m ++ agrega_unitaria_de_formula f, delete (agrega_unitaria_de_formula f) f)
 
 
 agrega_unitaria_de_formula :: Formula -> Modelo 
@@ -133,16 +133,38 @@ success (m,f) = if f == []
 					then True
 					else False
 
+-- Sección de funciones auxiliares para dpllsearch
+
+-- Devuelve si quedan literales dentro de la fórmula del lado derecho
+no_quedan_unit :: Solucion -> Bool
+no_quedan_unit (m,f) = if unit ([],f) == ([],f)	
+                       then True
+                       else False
+
+--Devuelve si el modelo de solución actual está vacío
+modelo_vacio :: Solucion -> Bool
+modelo_vacio (m,f) = if m == []	
+                       then True
+                       else False			
+
 -- Seccion de las funciones principales de DPLL
 
-dpllsearch :: Solucion -> Solucion
-dpllsearch (m,f) = error "Funcion a implementar"
+dpllsearch :: Solucion-> Solucion  
+dpllsearch (m,f) = if modelo_vacio (m,f) == True
+	                  then dpll (unit (m,f)) 
+	                  else if no_quedan_unit (m,f) == False
+	                  	   then dpll (unit (m,f))
+	                  	   else error "k"
 
 dpll :: Solucion -> Solucion
-dpll (m,f) = error "Funcion a implementar"
+dpll (m,f) = if success(m,f) == True
+	         then (m,f)
+	         else if conflict (m,f) == True
+	         	  then error "FAIL"
+	         	  else dpllsearch (m,f)
 
 main :: Solucion -> Solucion
-main s = error "Funcion a implementar"
+main (m,f) = dpll(m,f) 
 
 -- Ejemplos
 
@@ -160,7 +182,7 @@ exe5 = [[V "p", V "q", V "r"],
         [V "u", V "x"],
         [V "q", Neg (V "u")],
         [Neg (V "r"), Neg (V "u")]]
-exe6 = [[V "p"], [Neg (V "p")]]        
+exe6 = [[V "p"], [Neg (V "p")]]
 
 ejemplo1 = main ([], exe1)
 ejemplo2 = main ([], exe2)
